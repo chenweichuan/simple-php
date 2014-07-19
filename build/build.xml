@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="series" default="deploy">
+
+    <!-- *****************************************
+     DEPLOY SECTION
+    **********************************************-->
+    <target name="config">
+        <fail unless="deploy_env" message="Specify deploy_env with: -Ddeploy_env=" />
+        <!-- 默认版本号为当前日期加时间 -->
+        <tstamp>
+            <format property="default_version" pattern="%Y%m%d%H%M" locale="Zh_CN" />
+        </tstamp>
+        <if>
+            <not>
+                <isset property="revision" />
+            </not>
+            <then>
+                <property name="revision" value="${default_version}" />
+            </then>
+        </if>
+        <!-- 环境 -->
+        <if>
+            <equals arg1="${deploy_env}" arg2="prod" />
+            <then>
+                <property name="project_home" value="/opt/baofeng-data/series" />
+                <property name="config_type" value="online" />
+                <property name="web_servers" value="127.0.0.1" />
+                <if>
+                    <not>
+                        <isset property="web_server_user" />
+                    </not>
+                    <then>
+                        <property name="web_server_user" value="" />
+                    </then>
+                </if>
+                <if>
+                    <not>
+                        <isset property="web_server_pass" />
+                    </not>
+                    <then>
+                        <property name="web_server_pass" value="" />
+                    </then>
+                </if>
+            </then>
+        </if>
+        <if>
+            <equals arg1="${deploy_env}" arg2="test" />
+            <then>
+                <property name="project_home" value="/path/to/home" />
+                <property name="config_type" value="test" />
+                <property name="web_servers" value="127.0.0.1" />
+                <property name="web_server_user" value="test_user" />
+                <property name="web_server_pass" value="test_pass" />
+            </then>
+        </if>
+    </target>
+
+    <target name="deploy" depends="config">
+        <copy todir="./rev_${revision}" >
+            <fileset dir="../" defaultexcludes="true">
+                <include name="composer/**" />
+                <include name="config/**" />
+                <include name="Controller/**" />
+                <include name="Core/**" />
+                <include name="Lib/**" />
+                <include name="lua/**" />
+                <include name="Model/**" />
+                <include name="public/**" />
+                <exclude name="public/html" />
+                <exclude name="public/upload" />
+                <include name="shell/**" />
+                <include name="view/**" />
+            </fileset>
+        </copy>
+
+        <echo msg="Creating archive..." />
+        <tar destfile="./dist.tar.gz" compression="gzip">
+            <fileset dir="./" defaultexcludes="true">
+                <include name="rev_${revision}/**" />
+            </fileset>
+        </tar>
+        
+        <foreach list="${web_servers}" param="web_server" target="deploy_one" />
+
+        <delete dir="./rev_${revision}" includeemptydirs="true" failonerror="false" />
+        <delete file="./dist.tar.gz" />
+    </target>
+
+    <target name="rollback" depends="config">
+        <foreach list="${web_servers}" param="web_server" target="rollback_one" />
+    </target>
+    
+    <target name="deploy_one">
+        <scp username="${web_server_user}" password="${web_server_pass}"
+            host="${web_server}" todir="${project_home}/revs"
+            file="./dist.tar.gz" />
+        <ssh username="${web_server_user}" password="${web_server_pass}"
+             host="${web_server}"
+             command="cd ${project_home}/revs;
+                tar zxf dist.tar.gz 2> /dev/null;
+                ln -s ${project_home}/common/cache rev_${revision}/cache;
+                ln -s ${project_home}/common/log rev_${revision}/log;
+                rm -rf rev_${revision}/public/html;
+                ln -s ${project_home}/common/public/html rev_${revision}/public/html;
+                ln -s ${project_home}/common/vendor rev_${revision}/vendor;
+                cat rev_${revision}/config/config.${config_type}.php > rev_${revision}/config/config.php;
+                chmod 0755 -R rev_${revision}/shell/*;
+                rm -f ${project_home}/rollback;
+                mv ${project_home}/current ${project_home}/rollback;
+                ln -s ${project_home}/revs/rev_${revision} ${project_home}/current;
+				cd ${project_home}/current/composer;
+				php composer.phar dump-autoload;
+                rm -f ${project_home}/revs/dist.tar.gz;" />
+    </target>
+    
+    <target name="rollback_one">
+        <ssh username="${web_server_user}" password="${web_server_pass}"
+             host="${web_server}"
+             command="rm -f ${project_home}/current; 
+                mv ${project_home}/rollback ${project_home}/current; 
+                cp current rollback;" /> 
+    </target>
+</project>

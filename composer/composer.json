@@ -1,0 +1,11 @@
+{
+	"config": {
+		"vendor-dir": "../vendor"
+	},
+    "autoload": {
+        "classmap": ["../Lib"]
+    },
+    "require": {
+        "smarty/smarty": "v3.1.13"
+    }
+}

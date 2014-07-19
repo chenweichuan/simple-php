@@ -23,7 +23,7 @@
         <if>
             <equals arg1="${deploy_env}" arg2="prod" />
             <then>
-                <property name="project_home" value="/opt/baofeng-data/series" />
+                <property name="project_home" value="/path/to/project" />
                 <property name="config_type" value="online" />
                 <property name="web_servers" value="127.0.0.1" />
                 <if>
@@ -47,7 +47,7 @@
         <if>
             <equals arg1="${deploy_env}" arg2="test" />
             <then>
-                <property name="project_home" value="/path/to/home" />
+                <property name="project_home" value="/path/to/project" />
                 <property name="config_type" value="test" />
                 <property name="web_servers" value="127.0.0.1" />
                 <property name="web_server_user" value="test_user" />

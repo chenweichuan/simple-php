@@ -10,25 +10,25 @@ return array(
 		'w_host' => '127.0.0.1',
 		'port' => 3306,
 		'username' => 'root',
-		'password' => '223238',
+		'password' => '',
 		'dbname' => 'cms',
 		'charset' => 'UTF8'
 	),
 	// 存放Redis 配置
 	'redis' => array(
 		'series_movie_like' => array(
-	        'host' => '192.168.200.50',
-	        'port' => 6379,
+	        'host' => '127.0.0.1',
+	        'port' => 6380,
 	        'timeout' => 600,
 		),
 		'series_cache' => array(
 	        'host' => '127.0.0.1',
-	        'port' => 6382,
+	        'port' => 6380,
 	        'timeout' => 600,
 		),
 		'movie_data' => array(
-	        'host' => '192.168.200.36',
-	        'port' => 6378,
+	        'host' => '127.0.0.1',
+	        'port' => 6383,
 	        'timeout' => 600,
 		),
 	),

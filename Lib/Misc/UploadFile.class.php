@@ -144,37 +144,6 @@ class UploadFile
             return false;
         }
         if($this->thumb) {
-            // 生成图像缩略图
-			vendor("yu_image");
-			$img = new yu_image();
-			// 等比缩放
-			$img->param($filename)->thumb($file['savepath'].$this->thumbFile,$this->thumbMaxWidth,1000,0);
-
-//            import("ORG.Util.Image");
-//            $image =  Image::getImageInfo($filename);
-//			dump($image);
-//            if(false !== $image) {
-//                //是图像文件生成缩略图
-//                $thumbWidth		=	explode(',',$this->thumbMaxWidth);
-//                $thumbHeight		=	explode(',',$this->thumbMaxHeight);
-//                $thumbPrefix		=	explode(',',$this->thumbPrefix);
-//                $thumbSuffix = explode(',',$this->thumbSuffix);
-//                $thumbFile			=	explode(',',$this->thumbFile);
-//                $thumbPath    =  $this->thumbPath?$this->thumbPath:$file['savepath'];
-//                for($i=0,$len=count($thumbWidth); $i<$len; $i++) {
-//                    $thumbname	=	$thumbPath.$thumbPrefix[$i].substr($file['savename'],0,strrpos($file['savename'], '.')).$thumbSuffix[$i].'.'.$file['extension'];
-//                   dump($filename);dump($thumbname);
-//					$xxx = Image::thumb($filename,$thumbname,'',$thumbWidth[$i],$thumbHeight[$i],true);
-//					dump($xxx);
-//                }
-//                if($this->thumbRemoveOrigin) {
-//                    // 生成缩略图之后删除原图
-//                    unlink($filename);
-//                }
-//            }
-        }
-        if($this->zipImags) {
-            // TODO 对图片压缩包在线解压
 
         }
         return true;
